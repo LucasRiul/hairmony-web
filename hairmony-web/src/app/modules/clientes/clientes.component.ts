@@ -1,15 +1,17 @@
 import { Component } from '@angular/core';
-import { CrudComponent } from '../../Shared/crud/crud-list/crud-list.component';
+import { ClientesService } from './clientes.service';
 
 @Component({
   selector: 'app-clientes',
   imports: [
-    CrudComponent
   ],
   templateUrl: './clientes.component.html',
   styleUrl: './clientes.component.scss',
   standalone: true,
 })
 export class ClientesComponent {
-
+  
+  constructor(clienteService: ClientesService) {
+    
+  }
 }
