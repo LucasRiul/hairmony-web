@@ -1,15 +1,21 @@
-<div class="row">
-  <nav class="sidebar">
-    <div class="foto">
-     <img id="logo" src="assets/img/logo.png" alt="">
-    </div>
-    <a routerLink="/agenda" routerLinkActive="active"><span class="montserrat-400">AGENDA</span></a>
-    <a routerLink="/servicos" routerLinkActive="active"><span class="montserrat-400">SERVIÇOS</span></a>
-    <a routerLink="/colaboradores" routerLinkActive="active"><span class="montserrat-400">COLABORADORES</span></a>
-    <a routerLink="/clientes" routerLinkActive="active"><span class="montserrat-400">CLIENTES</span></a>
-  </nav>
+<!-- <div class="row"> -->
+  <div>
+    <nav class="sidebar" id="nav">
+      <div class="foto">
+       <img id="logo" src="assets/img/logo.png" alt="">
+      </div>
+      <a routerLink="/agenda" routerLinkActive="active"><span class="montserrat-400">AGENDA</span></a>
+      <a routerLink="/servicos" routerLinkActive="active"><span class="montserrat-400">SERVIÇOS</span></a>
+      <a routerLink="/colaboradores" routerLinkActive="active"><span class="montserrat-400">COLABORADORES</span></a>
+      <a routerLink="/clientes" routerLinkActive="active"><span class="montserrat-400">CLIENTES</span></a>
+      <div id="desenvolvido">
+        <span>Desenvolvido por</span> 
+        <span><img src="../assets/img/riulti.png" alt="" id="img-riulti"></span>
+      </div>
+    </nav>
+  </div>
 
   <main class="content">
     <router-outlet></router-outlet>
   </main>
-</div>
+<!-- </div> -->

@@ -17,6 +17,7 @@
   
   .sidebar a {
     color: white;
+    width: 205px;
     text-decoration: none;
     margin: 1rem 0;
     padding: 0.8rem 1rem;
@@ -72,4 +73,21 @@
     font-weight: 400;
     font-style: normal;
     font-size: 13px;
+  }
+  #desenvolvido{
+    border-top: 1px solid #f5f5f5;
+    width: 205px;
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 90vh;
+    align-items: center;
+  }
+  #img-riulti{
+    height: 50px;
+    width: auto;
+  }
+
+  #nav{
+    align-items: center;
   }
