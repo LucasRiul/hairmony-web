@@ -1,0 +1,38 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+.fundo-login{
+    background: linear-gradient(200deg, var(--primaria) 0%, var(--secundaria) 100%);
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.foto{
+    display: flex;
+    justify-content: center;
+}
+
+#row-entrar{
+    padding: 15px;
+}
+
+#row-form{
+    padding: 15px;
+    text-align: left; 
+}
+
+#card-login{
+    background: rgba($color: #fff, $alpha: 0.8);
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    text-align: center;
+}
+
+#btn-entrar{
+    width: 200px;
+    top: -15px;
+    position: relative;
+}

@@ -11,7 +11,7 @@ import { ClientesService } from './clientes.service';
 })
 export class ClientesComponent {
   
-  constructor(clienteService: ClientesService) {
+  constructor() {
     
   }
 }

@@ -3,8 +3,79 @@
 /* Importing Bootstrap SCSS file. */
 @import 'bootstrap/scss/bootstrap';
 
+:root{
+    --primaria: #790fa3;
+    --primaria-clara: #8f5da3;
+    --secundaria: #FF45B5;
+    --secundaria-clara: #ffa6db;
+}
+
 body { 
     font-family: "Montserrat", sans-serif ;
-    height: 100vh;
-    width: 100vh;
+}
+
+html, body, main, app-root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.titulo-hairmony{
+      color: var(--primaria);
+      font-weight: 600 !important;
+      padding: 10px;
+  }
+
+.filtros-hairmony{
+    padding: 10px;
+}
+
+.tabela-hairmony{
+    padding: 10px;
+}
+
+.card{
+    margin-top: 10px;
+    border: none;
+}
+
+.row-pesquisar{
+    display: flex;
+    justify-content: end;
+    padding: 10px 15px 10px 15px;
+}
+
+.btn-secundario{
+    // background-color: var(--primaria) !important;
+    color: var(--secundaria) !important;
+    border: 1px solid var(--secundaria);
+}
+
+.btn-secundario:hover{
+    background-color: var(--secundaria);
+    color: white !important;
+    border: 1px solid var(--secundaria);
+}
+
+.btn-secundario:active{
+    background-color: var(--secundaria-clara) !important;
+    color: white !important;
+    border: 1px solid var(--secundaria-clara) !important;
+}
+
+.btn-primario{
+    color: var(--primaria) !important;
+    border: 1px solid var(--primaria);
+}
+
+.btn-primario:hover{
+    background-color: var(--primaria);
+    color: white !important;
+    border: 1px solid var(--primaria);
+}
+
+.btn-primario:active{
+    background-color: var(--primaria-clara) !important;
+    color: white !important;
+    border: 1px solid var(--primaria-clara) !important;
 }

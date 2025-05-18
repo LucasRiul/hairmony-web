@@ -1,0 +1,45 @@
+<div class="fundo-login">
+  <div class="card col-6" id="card-login">
+    <div class="foto">
+      <img id="logo" src="assets/img/logo_invert.png" alt="" />
+    </div>
+    @if(loginError != ''){
+      <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        {{ loginError }}
+        <button type="button" class="btn-close" (click)="loginError = ''" aria-label="Close"></button>
+      </div>
+    }
+    <form>
+      <div class="row" id="row-form">
+        <div class="mb-3">
+          <label for="username" class="form-label">Nome de Usuário</label>
+          <input
+            [(ngModel)]="usuario.UserName"
+            type="text"
+            class="form-control"
+            id="username"
+            name="username"
+          />
+        </div>
+        <div class="mb-3">
+          <label for="senha" class="form-label">Senha</label>
+          <input
+            [(ngModel)]="usuario.Password"
+            type="password"
+            class="form-control"
+            id="senha"
+            name="senha"
+          />
+        </div>
+      </div>
+        <button
+          type="submit"
+          class="btn btn-primario"
+          id="btn-entrar"
+          (click)="Logar()"
+        >
+          Entrar
+        </button>
+    </form>
+  </div>
+</div>
