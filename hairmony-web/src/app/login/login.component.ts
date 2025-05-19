@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from './auth.service';
 import { Usuario } from './usuario';
@@ -21,8 +21,7 @@ export class LoginComponent {
   Logar(){
     this.authService.login(this.usuario).subscribe({
     next: (response) => {
-      console.log('Login realizado com sucesso:', response);
-      this.router.navigate(['/']);
+      this.router.navigate(['/agenda']);
     },
     error: (err) => {
       if (err.status === 401) {

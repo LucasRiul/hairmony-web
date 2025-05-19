@@ -1,1 +1,126 @@
-<p>servicos works!</p>
+<!-- Cabeçalho com título e botão de adicionar -->
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h2 class="titulo-hairmony mb-0">Serviços</h2>
+      <button class="btn btn-primario" (click)="openModal(formModal)">
+        <i class="bi bi-plus-circle me-2"></i>Novo Serviço
+      </button>
+    </div>
+  
+    <!-- Tabela de serviços -->
+    <div class="card-body">
+      <div class="table-responsive tabela-hairmony">
+        <table class="table table-striped servico-table">
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>Duração</th>
+              <th>Preço</th>
+              <th>Data de Cadastro</th>
+              <th class="text-center">Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            @if (isLoading) {
+              <tr>
+                <td colspan="5" class="text-center py-4">
+                  <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Carregando...</span>
+                  </div>
+                </td>
+              </tr>
+            }
+            
+            @if (!isLoading && servicos.length === 0) {
+              <tr>
+                <td colspan="5" class="text-center py-4">
+                  Nenhum serviço encontrado.
+                </td>
+              </tr>
+            }
+            
+            @for (servico of servicos; track servico.id) {
+              <tr>
+                <td>{{ servico.nome }}</td>
+                <td>{{ formatDuracao(servico.duracao) }}</td>
+                <td>{{ formatPreco(servico.preco) }}</td>
+                <td>{{ formatDate(servico.data_criacao) }}</td>
+                <td class="text-center">
+                  <div class="btn-group">
+                    <button class="btn btn-sm btn-primario me-2" (click)="openModal(formModal, servico)" title="Editar">
+                      <i class="bi bi-pencil-fill"></i>
+                    </button>
+                    <button class="btn btn-sm btn-secundario" (click)="openDeleteConfirmation(deleteModal, servico.id)" title="Excluir">
+                      <i class="bi bi-trash-fill"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Modal para adicionar/editar serviço -->
+  <ng-template #formModal let-modal>
+    <div class="modal-header">
+      <h4 class="modal-title titulo-hairmony">{{ isEditing ? 'Editar Serviço' : 'Novo Serviço' }}</h4>
+      <button type="button" class="btn-close" aria-label="Fechar" (click)="modal.dismiss()"></button>
+    </div>
+    <div class="modal-body">
+      <form [formGroup]="servicoForm">
+        <div class="mb-3">
+          <label for="nome" class="form-label">Nome*</label>
+          <input type="text" class="form-control" id="nome" formControlName="nome" placeholder="Nome do serviço">
+          @if (servicoForm.get('nome')?.invalid && servicoForm.get('nome')?.touched) {
+            <div class="text-danger mt-1">
+              Nome é obrigatório
+            </div>
+          }
+        </div>
+        <div class="mb-3">
+          <label for="duracao" class="form-label">Duração (minutos)*</label>
+          <input type="number" class="form-control" id="duracao" formControlName="duracao" min="1">
+          @if (servicoForm.get('duracao')?.invalid && servicoForm.get('duracao')?.touched) {
+            <div class="text-danger mt-1">
+              Duração é obrigatória e deve ser maior que zero
+            </div>
+          }
+        </div>
+        <div class="mb-3">
+          <label for="preco" class="form-label">Preço (R$)*</label>
+          <div class="input-group">
+            <span class="input-group-text">R$</span>
+            <input type="number" class="form-control" id="preco" formControlName="preco" min="0" step="0.01">
+          </div>
+          @if (servicoForm.get('preco')?.invalid && servicoForm.get('preco')?.touched) {
+            <div class="text-danger mt-1">
+              Preço é obrigatório e deve ser maior ou igual a zero
+            </div>
+          }
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline-secondary" (click)="modal.dismiss()">Cancelar</button>
+      <button type="button" class="btn btn-primario" (click)="saveServico()">{{ isEditing ? 'Atualizar' : 'Salvar' }}</button>
+    </div>
+  </ng-template>
+  
+  <!-- Modal de confirmação de exclusão -->
+  <ng-template #deleteModal let-modal>
+    <div class="modal-header">
+      <h4 class="modal-title titulo-hairmony">Confirmar Exclusão</h4>
+      <button type="button" class="btn-close" aria-label="Fechar" (click)="modal.dismiss()"></button>
+    </div>
+    <div class="modal-body">
+      <p>Tem certeza que deseja excluir este serviço? Esta ação não pode ser desfeita.</p>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline-secondary" (click)="modal.dismiss()">Cancelar</button>
+      <button type="button" class="btn btn-secundario" (click)="deleteServico()">Excluir</button>
+    </div>
+  </ng-template>
+  

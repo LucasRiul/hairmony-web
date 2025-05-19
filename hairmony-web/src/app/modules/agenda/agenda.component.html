@@ -1,1 +1,233 @@
-<p>agenda works!</p>
+<!-- Cabeçalho da agenda com navegação de data -->
+<div class="card agenda-container">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <div class="d-flex align-items-center">
+        <button class="btn btn-outline-secondary me-2" (click)="mudarData(-1)">
+          <i class="bi bi-chevron-left"></i>
+        </button>
+        <h2 class="titulo-hairmony mb-0">{{ formatarData(dataSelecionada) }}</h2>
+        <button class="btn btn-outline-secondary ms-2" (click)="mudarData(1)">
+          <i class="bi bi-chevron-right"></i>
+        </button>
+      </div>
+      <button class="btn btn-primario" (click)="openModal(formModal)">
+        <i class="bi bi-plus-circle me-2"></i>Novo Agendamento
+      </button>
+    </div>
+  
+    <!-- Grid da agenda -->
+    <div class="card-body p-0">
+      <!-- Cabeçalho com colaboradores -->
+      <div class="agenda-header">
+        <div class="agenda-time-column">
+          <div class="agenda-time-header">Horário</div>
+        </div>
+        <div class="agenda-colaboradores">
+          @for (colaborador of colaboradores; track colaborador.id) {
+            <div class="agenda-colaborador-column">
+              <div class="agenda-colaborador-header">
+                <div class="agenda-colaborador-nome">{{ colaborador.nome }}</div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+  
+      <!-- Grid de horários e agendamentos -->
+      <div class="agenda-grid">
+        <!-- Coluna de horários -->
+        <div class="agenda-time-column">
+          @for (horario of horarios; track horario.display) {
+            <div class="agenda-time-slot">
+              {{ horario.display }}
+            </div>
+          }
+        </div>
+  
+        <!-- Colunas de colaboradores com slots de horário -->
+        <div class="agenda-content">
+          @for (colaborador of colaboradores; track colaborador.id) {
+            <div class="agenda-colaborador-column">
+              @for (horario of horarios; track horario.display) {
+                <div class="agenda-slot"></div>
+              }
+            </div>
+          }
+  
+          <!-- Agendamentos sobrepostos -->
+          @if (isLoading) {
+            <div class="agenda-loading">
+              <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Carregando...</span>
+              </div>
+            </div>
+          }
+  
+          @for (agendamento of agendamentosVisuais; track agendamento.id) {
+            <div 
+              class="agenda-appointment" 
+              [style.top]="agendamento.top" 
+              [style.height]="agendamento.height" 
+              [style.left]="agendamento.left" 
+              [style.width]="agendamento.width" 
+              [style.background-color]="agendamento.backgroundColor" 
+              [style.color]="agendamento.textColor"
+              [class.concluido]="agendamento.concluido"
+            >
+              <div class="agenda-appointment-content">
+                <div class="agenda-appointment-time">
+                  {{ formatHorario(agendamento.data_de) }} - {{ formatHorario(agendamento.data_ate) }}
+                </div>
+                <div class="agenda-appointment-title">
+                  {{ getNomeCliente(agendamento.clienteId) }}
+                </div>
+                <div class="agenda-appointment-service">
+                  {{ getNomeServico(agendamento.servicoId) }}
+                </div>
+                <div class="agenda-appointment-price">
+                  {{ getPrecoServico(agendamento.servicoId) }}
+                </div>
+                <div class="agenda-appointment-actions">
+                  <button class="btn btn-sm btn-light" (click)="openModal(formModal, agendamento)" title="Editar">
+                    <i class="bi bi-pencil-fill"></i>
+                  </button>
+                  @if (!agendamento.concluido) {
+                    <button class="btn btn-sm btn-light" (click)="openConcluirConfirmation(concluirModal, agendamento.id)" title="Concluir">
+                      <i class="bi bi-check-lg"></i>
+                    </button>
+                  }
+                  <button class="btn btn-sm btn-light" (click)="openDeleteConfirmation(deleteModal, agendamento.id)" title="Excluir">
+                    <i class="bi bi-trash-fill"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Modal para adicionar/editar agendamento -->
+  <ng-template #formModal let-modal>
+    <div class="modal-header">
+      <h4 class="modal-title titulo-hairmony">{{ isEditing ? 'Editar Agendamento' : 'Novo Agendamento' }}</h4>
+      <button type="button" class="btn-close" aria-label="Fechar" (click)="modal.dismiss()"></button>
+    </div>
+    <div class="modal-body">
+      <form [formGroup]="agendamentoForm">
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label for="data_de" class="form-label">Data*</label>
+            <input type="date" class="form-control" id="data_de" formControlName="data_de">
+            @if (agendamentoForm.get('data_de')?.invalid && agendamentoForm.get('data_de')?.touched) {
+              <div class="text-danger mt-1">
+                Data é obrigatória
+              </div>
+            }
+          </div>
+          <div class="col-md-6">
+            <label for="hora" class="form-label">Horário*</label>
+            <input type="time" class="form-control" id="hora" formControlName="hora">
+            @if (agendamentoForm.get('hora')?.invalid && agendamentoForm.get('hora')?.touched) {
+              <div class="text-danger mt-1">
+                Horário é obrigatório
+              </div>
+            }
+          </div>
+        </div>
+        
+        <div class="mb-3">
+          <label for="clienteId" class="form-label">Cliente*</label>
+          <select class="form-select" id="clienteId" formControlName="clienteId">
+            <option value="">Selecione um cliente</option>
+            @for (cliente of clientes; track cliente.id) {
+              <option [value]="cliente.id">{{ cliente.nome }}</option>
+            }
+          </select>
+          @if (agendamentoForm.get('clienteId')?.invalid && agendamentoForm.get('clienteId')?.touched) {
+            <div class="text-danger mt-1">
+              Cliente é obrigatório
+            </div>
+          }
+        </div>
+        
+        <div class="mb-3">
+          <label for="servicoId" class="form-label">Serviço*</label>
+          <select class="form-select" id="servicoId" formControlName="servicoId">
+            <option value="">Selecione um serviço</option>
+            @for (servico of servicos; track servico.id) {
+              <option [value]="servico.id">{{ servico.nome }} - {{ servico.duracao }}min - {{ servico.preco | currency:'BRL' }}</option>
+            }
+          </select>
+          @if (agendamentoForm.get('servicoId')?.invalid && agendamentoForm.get('servicoId')?.touched) {
+            <div class="text-danger mt-1">
+              Serviço é obrigatório
+            </div>
+          }
+        </div>
+        
+        <div class="mb-3">
+          <label for="colaboradorId" class="form-label">Colaborador*</label>
+          <select class="form-select" id="colaboradorId" formControlName="colaboradorId">
+            <option value="">Selecione um colaborador</option>
+            @for (colaborador of colaboradores; track colaborador.id) {
+              <option [value]="colaborador.id">{{ colaborador.nome }}</option>
+            }
+          </select>
+          @if (agendamentoForm.get('colaboradorId')?.invalid && agendamentoForm.get('colaboradorId')?.touched) {
+            <div class="text-danger mt-1">
+              Colaborador é obrigatório
+            </div>
+          }
+        </div>
+        
+        @if (!isEditing) {
+          <div class="mb-3 form-check">
+            <input type="checkbox" class="form-check-input" id="repete" formControlName="repete">
+            <label class="form-check-label" for="repete">Agendamento recorrente</label>
+          </div>
+          
+          <div class="mb-3" *ngIf="agendamentoForm.get('repete')?.value">
+            <label for="dias" class="form-label">Repetir a cada (dias)</label>
+            <input type="number" class="form-control" id="dias" formControlName="dias" min="1">
+          </div>
+        }
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline-secondary" (click)="modal.dismiss()">Cancelar</button>
+      <button type="button" class="btn btn-primario" (click)="saveAgendamento()">{{ isEditing ? 'Atualizar' : 'Salvar' }}</button>
+    </div>
+  </ng-template>
+  
+  <!-- Modal de confirmação de exclusão -->
+  <ng-template #deleteModal let-modal>
+    <div class="modal-header">
+      <h4 class="modal-title titulo-hairmony">Confirmar Exclusão</h4>
+      <button type="button" class="btn-close" aria-label="Fechar" (click)="modal.dismiss()"></button>
+    </div>
+    <div class="modal-body">
+      <p>Tem certeza que deseja excluir este agendamento? Esta ação não pode ser desfeita.</p>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline-secondary" (click)="modal.dismiss()">Cancelar</button>
+      <button type="button" class="btn btn-secundario" (click)="deleteAgendamento()">Excluir</button>
+    </div>
+  </ng-template>
+  
+  <!-- Modal de confirmação de conclusão -->
+  <ng-template #concluirModal let-modal>
+    <div class="modal-header">
+      <h4 class="modal-title titulo-hairmony">Confirmar Conclusão</h4>
+      <button type="button" class="btn-close" aria-label="Fechar" (click)="modal.dismiss()"></button>
+    </div>
+    <div class="modal-body">
+      <p>Confirmar que este agendamento foi concluído?</p>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline-secondary" (click)="modal.dismiss()">Cancelar</button>
+      <button type="button" class="btn btn-primario" (click)="concluirAgendamento()">Confirmar</button>
+    </div>
+  </ng-template>
+  

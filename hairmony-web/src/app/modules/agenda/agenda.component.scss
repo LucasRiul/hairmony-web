@@ -1,0 +1,205 @@
+.agenda-container {
+    height: calc(100vh - 120px);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  
+  .agenda-header {
+    display: flex;
+    border-bottom: 1px solid #dee2e6;
+  }
+  
+  .agenda-time-column {
+    width: 80px;
+    min-width: 80px;
+    border-right: 1px solid #dee2e6;
+  }
+  
+  .agenda-time-header {
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 500;
+    background-color: var(--primaria);
+    color: white;
+  }
+  
+  .agenda-colaboradores {
+    display: flex;
+    flex: 1;
+  }
+  
+  .agenda-colaborador-column {
+    flex: 1;
+    min-width: 150px;
+    border-right: 1px solid #dee2e6;
+  }
+  
+  .agenda-colaborador-header {
+    height: 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    background-color: var(--primaria);
+    color: white;
+  }
+  
+  .agenda-avatar {
+    margin-bottom: 4px;
+  }
+  
+  .avatar-circle {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: white;
+    color: var(--primaria);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 16px;
+  }
+  
+  .agenda-colaborador-nome {
+    font-size: 14px;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    text-align: center;
+  }
+  
+  .agenda-grid {
+    display: flex;
+    flex: 1;
+    overflow-y: auto; /* Já existe, mas certifique-se que está presente */
+    position: relative;
+    max-height: calc(100vh - 180px); /* Adicione esta linha para limitar a altura */
+  }
+  
+  .agenda-content {
+    display: flex;
+    flex: 1;
+    position: relative;
+  }
+  
+  .agenda-time-slot {
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    color: #666;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  
+  .agenda-slot {
+    height: 40px;
+    border-bottom: 1px solid #f0f0f0;
+    border-right: 1px solid #f0f0f0;
+  }
+  
+  .agenda-appointment {
+    position: absolute;
+    border-radius: 4px;
+    padding: 4px 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+    transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+    cursor: pointer;
+    z-index: 10;
+  }
+  
+  .agenda-appointment:hover {
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+    z-index: 20;
+  }
+  
+  .agenda-appointment.concluido {
+    opacity: 0.7;
+  }
+  
+  .agenda-appointment-content {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    font-size: 12px;
+  }
+  
+  .agenda-appointment-time {
+    font-weight: bold;
+    margin-bottom: 2px;
+  }
+  
+  .agenda-appointment-title {
+    font-weight: 500;
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .agenda-appointment-service {
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .agenda-appointment-price {
+    font-weight: 500;
+  }
+  
+  .agenda-appointment-actions {
+    margin-top: auto;
+    display: flex;
+    justify-content: flex-end;
+    gap: 4px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+  
+  .agenda-appointment:hover .agenda-appointment-actions {
+    opacity: 1;
+  }
+  
+  .agenda-appointment-actions .btn {
+    padding: 2px 4px;
+    font-size: 10px;
+  }
+  
+  .agenda-loading {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(255, 255, 255, 0.7);
+    z-index: 30;
+  }
+  
+  /* Responsividade */
+  @media (max-width: 768px) {
+    .agenda-container {
+      height: auto;
+      min-height: calc(100vh - 120px);
+    }
+    
+    .agenda-colaborador-column {
+      min-width: 120px;
+    }
+    
+    .agenda-grid {
+      overflow-x: auto;
+    }
+  }
+  

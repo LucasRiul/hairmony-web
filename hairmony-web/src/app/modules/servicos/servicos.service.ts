@@ -1,35 +1,64 @@
 import { Injectable } from '@angular/core';
-import { environment } from '../../../environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
+import { switchMap } from 'rxjs/operators';
+
+interface Servico {
+  id: string; // Guid no backend
+  nome: string;
+  duracao: number;
+  preco: number;
+  data_criacao: Date;
+  salaoId: string; // Guid no backend
+}
 
 @Injectable({
   providedIn: 'root'
 })
-export class ServicosService {
+export class ServicoService {
+  public apiUrl = `${environment.apiUrl}/servicos`;
 
-  private baseUrl = environment.apiUrl; // ajuste conforme sua API
+  constructor(private http: HttpClient) { }
 
-  constructor(private http: HttpClient) {}
-
-  getAll(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.baseUrl}/servicos`);
+  getServicos(): Observable<Servico[]> {
+    return this.http.get<Servico[]>(this.apiUrl);
   }
 
-  getById(id: string): Observable<any> {
-    return this.http.get<any>(`${this.baseUrl}/servicos/${id}`);
+  getServico(id: string): Observable<Servico> {
+    return this.http.get<Servico>(`${this.apiUrl}/${id}`);
   }
 
-  create(data: any): Observable<any> {
-    return this.http.post(`${this.baseUrl}/servicos`, data);
+  createServico(servico: Omit<Servico, 'id' | 'data_criacao'>): Observable<Servico> {
+    const salaoId = this.getSalaoIdFromStorage();
+    const servicoComSalao = {
+      ...servico,
+      salaoId: salaoId
+    };
+    return this.http.post<Servico>(this.apiUrl, servicoComSalao);
   }
 
-  update(id: string, data: any): Observable<any> {
-    return this.http.put(`${this.baseUrl}/servicos/${id}`, data);
+  updateServico(id: string, servicoData: Partial<Omit<Servico, 'id' | 'salaoId' | 'data_criacao'>>): Observable<Servico> {
+    // Primeiro, buscar o serviço atual
+    return this.getServico(id).pipe(
+      switchMap(servicoAtual => {
+        // Criar um objeto atualizado mantendo os campos originais e atualizando apenas os novos
+        const servicoAtualizado = {
+          ...servicoAtual,
+          ...servicoData
+        };
+        
+        // Enviar o objeto completo para a API
+        return this.http.put<Servico>(`${this.apiUrl}/${id}`, servicoAtualizado);
+      })
+    );
   }
-
-  delete(id: string): Observable<any> {
-    return this.http.delete(`${this.baseUrl}/servicos/${id}`);
+  private getSalaoIdFromStorage(): string {
+    // Você pode armazenar o salaoId no localStorage após o login
+    // ou obtê-lo de um serviço centralizado
+    return localStorage.getItem('SALAO_ID') || '';
   }
-
+  deleteServico(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
 }

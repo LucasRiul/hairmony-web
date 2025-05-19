@@ -1,35 +1,153 @@
 import { Injectable } from '@angular/core';
-import { environment } from '../../../environments/environment';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, forkJoin } from 'rxjs';
+import { map, switchMap } from 'rxjs/operators';
+import { environment } from '../../../environments/environment';
+
+export interface Cliente {
+  id: string;
+  nome: string;
+  celular: string;
+}
+
+export interface Servico {
+  id: string;
+  nome: string;
+  duracao: number;
+  preco: number;
+}
+
+export interface Colaborador {
+  id: string;
+  nome: string;
+  ativo: boolean;
+}
+
+export interface Agendamento {
+  id: string; // Guid no backend
+  data_de: Date;
+  data_ate: Date;
+  concluido: boolean;
+  data_criacao: Date;
+  salaoId: string; // Guid no backend
+  clienteId: string; // Guid no backend
+  servicoId: string; // Guid no backend
+  colaboradorId: string; // Guid no backend
+  
+  // Propriedades adicionais para exibição na agenda
+  cliente?: Cliente;
+  servico?: Servico;
+  colaborador?: Colaborador;
+}
+
+export interface AgendamentoRequest {
+  data_de: Date;
+  clienteId: string;
+  servicoId: string;
+  colaboradorId: string;
+  concluido?: boolean;
+  repete?: boolean;
+  dias?: number;
+}
 
 @Injectable({
   providedIn: 'root'
 })
-export class AgendaService {
+export class AgendamentoService {
+  public apiUrl = `${environment.apiUrl}/agendamentos`;
 
-  private baseUrl = environment.apiUrl; // ajuste conforme sua API
+  constructor(private http: HttpClient) { }
 
-  constructor(private http: HttpClient) {}
-
-  getAll(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.baseUrl}/agenda`);
+  getAgendamentos(data?: Date): Observable<Agendamento[]> {
+    let url = this.apiUrl;
+    if (data) {
+      // Formatar a data para o formato esperado pela API
+      const dataFormatada = data.toISOString().split('T')[0];
+      url = `${this.apiUrl}?data=${dataFormatada}`;
+    }
+    return this.http.get<Agendamento[]>(url);
   }
 
-  getById(id: string): Observable<any> {
-    return this.http.get<any>(`${this.baseUrl}/agenda/${id}`);
+  getAgendamentosComDetalhes(data?: Date): Observable<Agendamento[]> {
+    return this.getAgendamentos(data).pipe(
+      switchMap(agendamentos => {
+        if (agendamentos.length === 0) {
+          return [[]];
+        }
+        
+        // Obter detalhes de clientes, serviços e colaboradores
+        const clientesIds = [...new Set(agendamentos.map(a => a.clienteId))];
+        const servicosIds = [...new Set(agendamentos.map(a => a.servicoId))];
+        const colaboradoresIds = [...new Set(agendamentos.map(a => a.colaboradorId))];
+        
+        const clientesRequest = this.http.get<Cliente[]>(`${environment.apiUrl}/clientes`);
+        const servicosRequest = this.http.get<Servico[]>(`${environment.apiUrl}/servicos`);
+        const colaboradoresRequest = this.http.get<Colaborador[]>(`${environment.apiUrl}/colaboradores`);
+        
+        return forkJoin([
+          clientesRequest,
+          servicosRequest,
+          colaboradoresRequest
+        ]).pipe(
+          map(([clientes, servicos, colaboradores]) => {
+            return agendamentos.map(agendamento => {
+              const cliente = clientes.find(c => c.id === agendamento.clienteId);
+              const servico = servicos.find(s => s.id === agendamento.servicoId);
+              const colaborador = colaboradores.find(c => c.id === agendamento.colaboradorId);
+              
+              return {
+                ...agendamento,
+                cliente,
+                servico,
+                colaborador
+              };
+            });
+          })
+        );
+      })
+    );
   }
 
-  create(data: any): Observable<any> {
-    return this.http.post(`${this.baseUrl}/agenda`, data);
+  getAgendamento(id: string): Observable<Agendamento> {
+    return this.http.get<Agendamento>(`${this.apiUrl}/${id}`);
   }
 
-  update(id: string, data: any): Observable<any> {
-    return this.http.put(`${this.baseUrl}/agenda/${id}`, data);
+  createAgendamento(agendamento: AgendamentoRequest): Observable<Agendamento> {
+    const salaoId = this.getSalaoIdFromStorage();
+    const agendamentoComSalao = {
+      ...agendamento,
+      salaoId: salaoId
+    };
+    return this.http.post<Agendamento>(this.apiUrl, agendamentoComSalao);
   }
 
-  delete(id: string): Observable<any> {
-    return this.http.delete(`${this.baseUrl}/agenda/${id}`);
+  updateAgendamento(id: string, agendamentoData: Partial<Agendamento>): Observable<Agendamento> {
+    // Primeiro, buscar o agendamento atual
+    return this.getAgendamento(id).pipe(
+      switchMap(agendamentoAtual => {
+        // Criar um objeto atualizado mantendo os campos originais e atualizando apenas os novos
+        const agendamentoAtualizado = {
+          ...agendamentoAtual,
+          ...agendamentoData
+        };
+        
+        // Enviar o objeto completo para a API
+        return this.http.put<Agendamento>(`${this.apiUrl}/${id}`, agendamentoAtualizado);
+      })
+    );
   }
 
+  concluirAgendamento(id: string): Observable<Agendamento> {
+    return this.updateAgendamento(id, { concluido: true });
+  }
+
+  deleteAgendamento(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
+
+  private getSalaoIdFromStorage(): string {
+    // Você pode armazenar o salaoId no localStorage após o login
+    // ou obtê-lo de um serviço centralizado
+    return localStorage.getItem('SALAO_ID') || '';
+  }
 }

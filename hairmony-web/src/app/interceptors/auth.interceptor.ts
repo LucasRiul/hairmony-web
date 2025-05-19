@@ -1,29 +1,17 @@
-import { Injectable } from '@angular/core';
-import {
-  HttpRequest,
-  HttpHandler,
-  HttpEvent,
-  HttpInterceptor
-} from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { AuthService } from '../login/auth.service'; // Ajuste o caminho
+import { HttpInterceptorFn } from '@angular/common/http';
 
-@Injectable( )
-export class AuthInterceptor implements HttpInterceptor {
+export const authInterceptor: HttpInterceptorFn = (req, next) => {
+  // Recuperar o token do localStorage
+  const token = localStorage.getItem('JWT_TOKEN');
 
-  constructor(private authService: AuthService) {}
-
-  intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
-    const token = this.authService.getToken();
-
-    if (token) {
-      // Clone a requisição para adicionar o novo cabeçalho.
-      const cloned = request.clone({
-        headers: request.headers.set('Authorization', `Bearer ${token}`)
-      });
-      return next.handle(cloned);
-    }
-
-    return next.handle(request);
+  if (token) {
+    // Clone a requisição e adicione o token no cabeçalho Authorization
+    const authReq = req.clone({
+      headers: req.headers.set('Authorization', `Bearer ${token}`)
+    });
+    return next(authReq);
   }
-}
+
+  // Se não houver token, prossiga com a requisição original
+  return next(req);
+};

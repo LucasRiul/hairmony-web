@@ -1,51 +1,118 @@
-<div class="container">
-  <div class="card col-xs-12">
-    <h2 class="titulo-hairmony">Clientes</h2>
-  </div>
-  <div class="card col-xs-12">
-    <div class="filtros-hairmony">
-      <div class="row">
-        <span> filtros ....</span>
-      </div>
-      <div class="row row-pesquisar">
-        <button type="button" class="btn btn-secundario btn-outline-primary col-2" > 
-          <span>
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
-              <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
-            </svg>
-          </span>
-           Pesquisar</button>
+<!-- Cabeçalho com título e botão de adicionar -->
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h2 class="titulo-hairmony mb-0">Clientes</h2>
+      <button class="btn btn-primario" (click)="openModal(formModal)">
+        <i class="bi bi-plus-circle me-2"></i>Novo Cliente
+      </button>
+    </div>
+  
+    <!-- Tabela de clientes -->
+    <div class="card-body">
+      <div class="table-responsive tabela-hairmony">
+        <table class="table table-striped cliente-table">
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>WhatsApp</th>
+              <th>Data de Cadastro</th>
+              <th class="text-center">Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            @if (isLoading) {
+              <tr>
+                <td colspan="4" class="text-center py-4">
+                  <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Carregando...</span>
+                  </div>
+                </td>
+              </tr>
+            }
+            
+            @if (!isLoading && clientes.length === 0) {
+              <tr>
+                <td colspan="4" class="text-center py-4">
+                  Nenhum cliente encontrado.
+                </td>
+              </tr>
+            }
+            
+            @for (cliente of clientes; track cliente.id) {
+              <tr>
+                <td>{{ cliente.nome }}</td>
+                <td>
+                    <i class="bi bi-whatsapp" style="color: green;"></i><a href="https://api.whatsapp.com/send/?phone=55{{ cliente.celular }}&text&type=phone_number&app_absent=0" target="_blank">
+                    {{ cliente.celular }}
+                    </a>
+                </td>
+                <td>{{ formatDate(cliente.data_criacao) }}</td>
+                <td class="text-center">
+                  <div class="btn-group">
+                    <button class="btn btn-sm btn-primario me-2" (click)="openModal(formModal, cliente)" title="Editar">
+                      <i class="bi bi-pencil-fill"></i>
+                    </button>
+                    <button class="btn btn-sm btn-secundario" (click)="openDeleteConfirmation(deleteModal, cliente.id)" title="Excluir">
+                      <i class="bi bi-trash-fill"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
-
-  <div class="card col-xs-12">
-    <table class="table table-striped tabela-hairmony">
-      <thead>
-        <tr>
-          <th scope="col">Nome</th>
-          <th scope="col">Celular</th>
-          <th scope="col">Status</th>
-          <th scope="col">Última Aparição</th>
-          <th scope="col">Ações</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Lucas</td>
-          <td>Otto</td>
-          <td>a</td>
-          <td>a</td>
-          <td>a</td>
-        </tr>
-        <tr>
-          <td>Bia</td>
-          <td>Otto</td>
-          <td>a</td>
-          <td>a</td>
-          <td>a</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-</div>
+  
+  <!-- Modal para adicionar/editar cliente -->
+  <ng-template #formModal let-modal>
+    <div class="modal-header">
+      <h4 class="modal-title titulo-hairmony">{{ isEditing ? 'Editar Cliente' : 'Novo Cliente' }}</h4>
+      <button type="button" class="btn-close" aria-label="Fechar" (click)="modal.dismiss()"></button>
+    </div>
+    <div class="modal-body">
+      <form [formGroup]="clienteForm">
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label for="nome" class="form-label">Nome*</label>
+            <input type="text" class="form-control" id="nome" formControlName="nome" placeholder="Nome completo">
+            @if (clienteForm.get('nome')?.invalid && clienteForm.get('nome')?.touched) {
+              <div class="text-danger mt-1">
+                Nome é obrigatório
+              </div>
+            }
+          </div>
+          <div class="col-md-6">
+            <label for="celular" class="form-label">Celular*</label>
+            <input type="tel" class="form-control" id="celular" formControlName="celular" placeholder="(00) 00000-0000" mask="(00) 0 0000 0000" prefix="+55 ">
+            @if (clienteForm.get('celular')?.invalid && clienteForm.get('celular')?.touched) {
+              <div class="text-danger mt-1">
+                Celular é obrigatório
+              </div>
+            }
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline-secondary" (click)="modal.dismiss()">Cancelar</button>
+      <button type="button" class="btn btn-primario" (click)="saveCliente()">{{ isEditing ? 'Atualizar' : 'Salvar' }}</button>
+    </div>
+  </ng-template>
+  
+  <!-- Modal de confirmação de exclusão -->
+  <ng-template #deleteModal let-modal>
+    <div class="modal-header">
+      <h4 class="modal-title titulo-hairmony">Confirmar Exclusão</h4>
+      <button type="button" class="btn-close" aria-label="Fechar" (click)="modal.dismiss()"></button>
+    </div>
+    <div class="modal-body">
+      <p>Tem certeza que deseja excluir este cliente? Esta ação não pode ser desfeita.</p>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline-secondary" (click)="modal.dismiss()">Cancelar</button>
+      <button type="button" class="btn btn-secundario" (click)="deleteCliente()">Excluir</button>
+    </div>
+  </ng-template>
+  

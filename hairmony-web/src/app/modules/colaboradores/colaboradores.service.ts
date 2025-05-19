@@ -1,35 +1,64 @@
 import { Injectable } from '@angular/core';
-import { environment } from '../../../environments/environment';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, switchMap } from 'rxjs';
+import { environment } from '../../../environments/environment';
+
+interface Colaborador {
+  id: string; // Guid no backend
+  nome: string;
+  ativo: boolean;
+  data_criacao: Date;
+  salaoId: string; // Guid no backend
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class ColaboradoresService {
+  public apiUrl = `${environment.apiUrl}/colaboradores`;
 
-  private baseUrl = environment.apiUrl; // ajuste conforme sua API
+  constructor(private http: HttpClient) { }
 
-  constructor(private http: HttpClient) {}
-
-  getAll(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.baseUrl}/colaboradores`);
+  getColaboradores(): Observable<Colaborador[]> {
+    return this.http.get<Colaborador[]>(this.apiUrl);
   }
 
-  getById(id: string): Observable<any> {
-    return this.http.get<any>(`${this.baseUrl}/colaboradores/${id}`);
+  getColaborador(id: string): Observable<Colaborador> {
+    return this.http.get<Colaborador>(`${this.apiUrl}/${id}`);
   }
 
-  create(data: any): Observable<any> {
-    return this.http.post(`${this.baseUrl}/colaboradores`, data);
+  createColaborador(colaborador: Omit<Colaborador, 'id' | 'data_criacao'>): Observable<Colaborador> {
+    const salaoId = this.getSalaoIdFromStorage();
+    const colaboradorComSalao = {
+      ...colaborador,
+      salaoId: salaoId
+    };
+    return this.http.post<Colaborador>(this.apiUrl, colaboradorComSalao);
   }
 
-  update(id: string, data: any): Observable<any> {
-    return this.http.put(`${this.baseUrl}/colaboradores/${id}`, data);
+  updateColaborador(id: string, colaboradorData: Partial<Omit<Colaborador, 'id' | 'salaoId' | 'data_criacao'>>): Observable<Colaborador> {
+    // Primeiro, buscar o colaborador atual
+    return this.getColaborador(id).pipe(
+      switchMap(colaboradorAtual => {
+        // Criar um objeto atualizado mantendo os campos originais e atualizando apenas os novos
+        const colaboradorAtualizado = {
+          ...colaboradorAtual,
+          ...colaboradorData
+        };
+        
+        // Enviar o objeto completo para a API
+        return this.http.put<Colaborador>(`${this.apiUrl}/${id}`, colaboradorAtualizado);
+      })
+    );
   }
 
-  delete(id: string): Observable<any> {
-    return this.http.delete(`${this.baseUrl}/colaboradores/${id}`);
+  deleteColaborador(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 
+  private getSalaoIdFromStorage(): string {
+    // Você pode armazenar o salaoId no localStorage após o login
+    // ou obtê-lo de um serviço centralizado
+    return localStorage.getItem('SALAO_ID') || '';
+  }
 }

@@ -1,0 +1,79 @@
+.cliente-table {
+    --bs-table-striped-bg: rgba(255, 166, 219, 0.15); /* Cor secundária mais clara para as linhas alternadas */
+    --bs-table-striped-color: inherit;
+  }
+  
+  .cliente-table thead {
+    background-color: var(--primaria);
+    color: white;
+  }
+  
+  .cliente-table th {
+    font-weight: 500;
+    padding: 12px 15px;
+  }
+  
+  .cliente-table td {
+    padding: 12px 15px;
+    vertical-align: middle;
+  }
+  
+  /* Estilização para os botões de ação */
+  .btn-group .btn {
+    border-radius: 4px;
+    padding: 0.25rem 0.5rem;
+    transition: all 0.2s ease;
+  }
+  
+  /* Hover effect para as linhas da tabela */
+  .cliente-table tbody tr:hover {
+    background-color: rgba(255, 166, 219, 0.25) !important;
+    cursor: pointer;
+  }
+  
+  /* Estilização para o modal */
+  .modal-header {
+    border-bottom: 2px solid var(--primaria);
+  }
+  
+  .modal-footer {
+    border-top: 1px solid #dee2e6;
+  }
+  
+  /* Estilização para o formulário dentro do modal */
+  .form-label {
+    font-weight: 500;
+    color: var(--primaria);
+  }
+  
+  .form-control:focus {
+    border-color: var(--primaria);
+    box-shadow: 0 0 0 0.25rem rgba(121, 15, 163, 0.25);
+  }
+  
+  /* Animação para o loading spinner */
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+  
+  .spinner-border {
+    animation: spin 1s linear infinite;
+    color: var(--primaria) !important;
+  }
+  
+  /* Responsividade para telas menores */
+  @media (max-width: 768px) {
+    .table-responsive {
+      overflow-x: auto;
+    }
+    
+    .card-header {
+      flex-direction: column;
+      align-items: flex-start !important;
+    }
+    
+    .card-header button {
+      margin-top: 10px;
+    }
+  }
+  

@@ -37,13 +37,14 @@ export class AuthService {
   }
 
   login(credentials: Usuario): Observable<AuthResponse> {
+     
     return this.http
       .post<AuthResponse>(`${this.baseUrl}/Auth/login`, credentials)
       .pipe(
         tap((response) => {
-           ;
+            
           this.usuarioAutenticado = true;
-        this.mostrarMenuEmitter.emit(true);
+          this.mostrarMenuEmitter.emit(true);
           this.storeToken(response.token, response.salao);
           this.isAuthenticatedSubject.next(true);
         })
