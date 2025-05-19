@@ -19,7 +19,6 @@ export class LoginComponent {
   }
 
   Logar(){
-    console.log(this.usuario);
     this.authService.login(this.usuario).subscribe({
     next: (response) => {
       console.log('Login realizado com sucesso:', response);
@@ -31,7 +30,7 @@ export class LoginComponent {
       } else {
         this.loginError = 'Erro ao tentar fazer login. Tente novamente mais tarde.';
       }
-      console.error(err);
+      this.authService.logout();
     }
   });
   }

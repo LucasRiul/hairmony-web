@@ -9,6 +9,7 @@ import { isPlatformBrowser } from '@angular/common';
 
 export interface AuthResponse {
   token: string;
+  salao: string;
   // Adicione outras propriedades se o seu backend retornar mais dados no login
 }
 
@@ -35,27 +36,15 @@ export class AuthService {
     this.isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
   }
 
-  fazerLogin(usuario: Usuario) {
-    if (usuario.UserName === 'lucas' && usuario.Password === '123') {
-      this.usuarioAutenticado = true;
-      this.mostrarMenuEmitter.emit(true);
-      this.router.navigate(['/']);
-    } else {
-      this.usuarioAutenticado = false;
-      this.mostrarMenuEmitter.emit(false);
-    }
-  }
-
   login(credentials: Usuario): Observable<AuthResponse> {
-    debugger;
     return this.http
       .post<AuthResponse>(`${this.baseUrl}/Auth/login`, credentials)
       .pipe(
         tap((response) => {
-          debugger;
+           ;
           this.usuarioAutenticado = true;
         this.mostrarMenuEmitter.emit(true);
-          this.storeToken(response.token);
+          this.storeToken(response.token, response.salao);
           this.isAuthenticatedSubject.next(true);
         })
       );
@@ -86,17 +75,9 @@ export class AuthService {
     return false;
   }
 
-  private storeToken(token: string): void {
+  private storeToken(token: string, salao: string): void {
     localStorage.setItem(this.JWT_TOKEN, token);
-    // Decodificar o token para extrair o salaoId (exemplo básico)
-    try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      if (payload.salaoId) {
-        localStorage.setItem(this.SALAO_ID, payload.salaoId);
-      }
-    } catch (e) {
-      console.error('Erro ao decodificar o token:', e);
-    }
+    localStorage.setItem(this.SALAO_ID, salao);
   }
 
   private removeToken(): void {
