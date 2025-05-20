@@ -11,12 +11,15 @@
         </button>
       </div>
       <button class="btn btn-primario" (click)="openModal(formModal)">
-        <i class="bi bi-plus-circle me-2"></i>Novo Agendamento
+        <i class="bi bi-plus-circle me-2"></i> Agendamento
+      </button>
+      <button class="btn btn-secundario" (click)="baixarRelatorio()">
+        <i class="bi bi-file-earmark-arrow-down-fill"></i> Rel. Semanal
       </button>
     </div>
   
     <!-- Grid da agenda -->
-    <div class="card-body p-0">
+    <div class="card-body p-2">
       <!-- Cabeçalho com colaboradores -->
       <div class="agenda-header">
         <div class="agenda-time-column">
@@ -76,16 +79,7 @@
             >
               <div class="agenda-appointment-content">
                 <div class="agenda-appointment-time">
-                  {{ formatHorario(agendamento.data_de) }} - {{ formatHorario(agendamento.data_ate) }}
-                </div>
-                <div class="agenda-appointment-title">
-                  {{ getNomeCliente(agendamento.clienteId) }}
-                </div>
-                <div class="agenda-appointment-service">
-                  {{ getNomeServico(agendamento.servicoId) }}
-                </div>
-                <div class="agenda-appointment-price">
-                  {{ getPrecoServico(agendamento.servicoId) }}
+                  {{ formatHorario(agendamento.data_de) }} - {{ formatHorario(agendamento.data_ate) }} | {{ getNomeCliente(agendamento.clienteId) }} | {{ getNomeServico(agendamento.servicoId) }} | {{ getPrecoServico(agendamento.servicoId) }}
                 </div>
                 <div class="agenda-appointment-actions">
                   <button class="btn btn-sm btn-light" (click)="openModal(formModal, agendamento)" title="Editar">

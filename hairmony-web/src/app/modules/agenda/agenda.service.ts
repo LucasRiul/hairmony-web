@@ -118,7 +118,7 @@ export class AgendamentoService {
       ...agendamento,
       salaoId: salaoId
     };
-    return this.http.post<Agendamento>(this.apiUrl, agendamentoComSalao);
+    return this.http.post<Agendamento>(`${this.apiUrl}?repete=${agendamento.repete}&dias=${agendamento.dias}`, agendamentoComSalao);
   }
 
   updateAgendamento(id: string, agendamentoData: Partial<Agendamento>): Observable<Agendamento> {
@@ -143,6 +143,12 @@ export class AgendamentoService {
 
   deleteAgendamento(id: string): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
+
+  relatorioSemanal(){
+    return this.http.get(`${this.apiUrl}/relatorio-semanal`,{
+      responseType: 'blob'
+    })
   }
 
   private getSalaoIdFromStorage(): string {

@@ -10,6 +10,7 @@ interface Cliente {
   id: string; // Guid no backend
   nome: string;
   celular: string;
+  celularFormatado: string;
   data_criacao: Date;
   salaoId: string; // Guid no backend
 }
@@ -48,7 +49,11 @@ export class ClientesComponent implements OnInit {
     this.isLoading = true;
     this.clienteService.getClientes().subscribe({
       next: (data) => {
+        debugger
         this.clientes = data;
+        this.clientes.forEach(cli => {
+          cli.celularFormatado = this.formatFone(cli.celular);
+        });
         this.isLoading = false;
       },
       error: (error) => {
@@ -151,5 +156,23 @@ export class ClientesComponent implements OnInit {
     if (!dateString) return '';
     const date = new Date(dateString);
     return date.toLocaleDateString('pt-BR');
+  }
+
+  formatFone(telefone: string): string {
+    if (!telefone) return '';
+
+    const cleaned = telefone.replace(/\D/g, '');
+
+    if (cleaned.length === 11) {
+      // (99) 99999-9999
+      return cleaned.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+    }
+
+    if (cleaned.length === 10) {
+      // (99) 9999-9999
+      return cleaned.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3');
+    }
+
+    return telefone; // Se não tiver 10 ou 11 dígitos, retorna original
   }
 }

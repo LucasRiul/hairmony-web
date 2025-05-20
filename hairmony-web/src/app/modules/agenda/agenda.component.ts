@@ -8,6 +8,8 @@ import { ClienteService } from '../clientes/clientes.service';
 import { ServicoService } from '../servicos/servicos.service';
 import { ColaboradoresService } from '../colaboradores/colaboradores.service';
 import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
+import { Observable, of } from 'rxjs';
+import { map, switchMap, tap } from 'rxjs/operators';
 
 interface Cliente {
   id: string;
@@ -111,7 +113,7 @@ export class AgendaComponent implements OnInit {
 
   gerarHorarios(): void {
     this.horarios = [];
-    for (let hora = 8; hora <= 18; hora++) {
+    for (let hora = 6; hora <= 23; hora++) {
       for (let minuto = 0; minuto < 60; minuto += 30) {
         const horaStr = hora.toString().padStart(2, '0');
         const minutoStr = minuto.toString().padStart(2, '0');
@@ -166,25 +168,30 @@ export class AgendaComponent implements OnInit {
     });
   }
 
+  // Função auxiliar para comparar apenas as datas (sem horas)
+  private saoMesmaData(data1: Date, data2: Date): boolean {
+    return (
+      data1.getFullYear() === data2.getFullYear() &&
+      data1.getMonth() === data2.getMonth() &&
+      data1.getDate() === data2.getDate()
+    );
+  }
+
   processarAgendamentosVisuais(): void {
     this.agendamentosVisuais = [];
     
     console.log('Todos agendamentos:', this.agendamentos);
     
+    // Criar uma cópia da data selecionada para comparação
+    const dataSelecionadaObj = new Date(this.dataSelecionada);
+    
     // Filtrar agendamentos apenas para a data selecionada
     const agendamentosDoDia = this.agendamentos.filter(agendamento => {
       // Converter para objetos Date
       const dataAgendamento = new Date(agendamento.data_de);
-      const dataSelecionada = new Date(this.dataSelecionada);
       
-      // Formatar para comparação apenas a data (sem hora)
-      const dataAgendamentoStr = dataAgendamento.toISOString().split('T')[0];
-      const dataSelecionadaStr = dataSelecionada.toISOString().split('T')[0];
-      
-      console.log('Comparando datas:', dataAgendamentoStr, dataSelecionadaStr);
-      
-      // Comparar as strings de data
-      return dataAgendamentoStr === dataSelecionadaStr;
+      // Comparar apenas as datas (sem horas)
+      return this.saoMesmaData(dataAgendamento, dataSelecionadaObj);
     });
     
     console.log('Agendamentos filtrados para o dia:', agendamentosDoDia);
@@ -219,11 +226,11 @@ export class AgendaComponent implements OnInit {
       const duracaoMinutos = totalMinutosFim - totalMinutosInicio;
       
       // Calcular posição relativa ao início da agenda (8:00)
-      const inicioAgenda = 8 * 60; // 8:00 em minutos
-      const topPosicao = ((totalMinutosInicio - inicioAgenda) / 30) * 40; // 40px por slot de 30min
-      const altura = (duracaoMinutos / 30) * 40; // 40px por slot de 30min
+      const inicioAgenda = 6 * 60; // 6:00 em minutos
+      const topPosicao = ((totalMinutosInicio - inicioAgenda) / 30) * 65; // 65px por slot de 30min
+      const altura = (duracaoMinutos / 30) * 65; // 65px por slot de 30min
       
-      // Calcular posição horizontal baseada no colaborador
+      // Obter o índice da coluna para o colaborador deste agendamento
       const colIndex = colaboradoresMap.get(agendamento.colaboradorId);
       
       // Se o colaborador não for encontrado, não mostrar o agendamento
@@ -233,22 +240,20 @@ export class AgendaComponent implements OnInit {
       }
       
       // Calcular a posição left baseada no índice da coluna
-      // Cada coluna tem 100% de largura em relação ao seu container
-      const leftPosicao = `${colIndex * 100}%`;
-      const largura = '100%'; // Cada agendamento ocupa 100% da largura da coluna
+      const leftPosicao = `${colIndex * 20}%`;
       
       // Selecionar cor baseada no serviço ou status
       const corIndex = index % this.cores.length;
       const cor = agendamento.concluido 
         ? { bg: '#E0E0E0', text: '#505050' } // Cinza para concluídos
         : this.cores[corIndex];
-      
+      var widthC = 100 / colaboradoresMap.size;
       this.agendamentosVisuais.push({
         ...agendamento,
         top: `${topPosicao}px`,
         height: `${altura}px`,
         left: leftPosicao,
-        width: largura,
+        width: `${widthC}%`,
         backgroundColor: cor.bg,
         textColor: cor.text
       });
@@ -273,16 +278,19 @@ export class AgendaComponent implements OnInit {
 
   openModal(content: any, agendamento?: Agendamento): void {
     if (agendamento) {
+      debugger
       // Edição de agendamento existente
       this.isEditing = true;
       this.currentAgendamentoId = agendamento.id;
       
       const dataAgendamento = new Date(agendamento.data_de);
+      const dataFormatada = dataAgendamento.toISOString().substring(0, 10);
       const hora = dataAgendamento.getHours().toString().padStart(2, '0');
       const minutos = dataAgendamento.getMinutes().toString().padStart(2, '0');
       
       this.agendamentoForm.patchValue({
-        data_de: dataAgendamento,
+        // data_de: dataAgendamento,
+        data_de: `${dataFormatada}`,
         hora: `${hora}:${minutos}`,
         clienteId: agendamento.clienteId,
         servicoId: agendamento.servicoId,
@@ -294,9 +302,10 @@ export class AgendaComponent implements OnInit {
       // Novo agendamento
       this.isEditing = false;
       this.currentAgendamentoId = null;
+      var dt  = this.dataSelecionada.toISOString().substring(0, 10);
       
       this.agendamentoForm.patchValue({
-        data_de: this.dataSelecionada,
+        data_de: dt,
         hora: '08:00',
         repete: false,
         dias: 7
@@ -320,6 +329,19 @@ export class AgendaComponent implements OnInit {
     this.modalService.open(content, { centered: true });
   }
 
+  // Função auxiliar para criar uma data UTC a partir de uma data local e hora
+  private criarDataUTC(dataLocal: Date, horaStr: string): Date {
+    const [horas, minutos] = horaStr.split(':').map(Number);
+    
+    // Criar uma nova data para não modificar a original
+    const data = new Date(dataLocal);
+    
+    // Definir horas e minutos
+    data.setHours(horas, minutos, 0, 0);
+    
+    return data;
+  }
+
   saveAgendamento(): void {
     if (this.agendamentoForm.invalid) {
       // Marcar todos os campos como touched para mostrar erros
@@ -332,25 +354,13 @@ export class AgendaComponent implements OnInit {
 
     const formData = this.agendamentoForm.value;
     
-    // Combinar data e hora
-    // Combinar data e hora
-    const dataSelecionada = new Date(formData.data_de);
-    const [horas, minutos] = formData.hora.split(':').map(Number);
-
-    // Ajustar para o fuso horário local
-    dataSelecionada.setHours(horas, minutos, 0, 0);
-
-    // Criar uma string ISO sem o ajuste de fuso horário
-    // const dataISO = dataSelecionada.toISOString();
-
-    const agendamentoRequest: AgendamentoRequest = {
-      data_de: dataSelecionada, // Enviar como string ISO
-      clienteId: formData.clienteId,
-      servicoId: formData.servicoId,
-      colaboradorId: formData.colaboradorId,
-      repete: formData.repete,
-      dias: formData.repete ? formData.dias : undefined
-    };
+    // Obter a data do formulário
+    const dataForm = new Date(formData.data_de + 'T' + formData.hora + ':00');
+    
+    // Criar uma data com a hora selecionada
+    
+    // Calcular data_ate baseado na duração do serviço
+    const servico = this.servicos.find(s => s.id === formData.servicoId);
     
     if (this.isEditing && this.currentAgendamentoId) {
       // Buscar o agendamento atual primeiro
@@ -359,19 +369,14 @@ export class AgendaComponent implements OnInit {
           // Criar objeto completo com todos os campos originais + atualizações
           const agendamentoCompleto = {
             ...agendamentoAtual,
-            data_de: dataSelecionada,
+            data_de: dataForm,
+            data_ate: dataForm,
             clienteId: formData.clienteId,
             servicoId: formData.servicoId,
             colaboradorId: formData.colaboradorId
           };
           
-          // Calcular data_ate baseado na duração do serviço
-          const servico = this.servicos.find(s => s.id === formData.servicoId);
-          if (servico) {
-            const dataAte = new Date(dataSelecionada);
-            dataAte.setMinutes(dataAte.getMinutes() + servico.duracao);
-            agendamentoCompleto.data_ate = dataAte;
-          }
+          console.log('Atualizando agendamento:', agendamentoCompleto);
           
           // Enviar o objeto completo para a API
           this.http.put(`${this.agendamentoService.apiUrl}/${this.currentAgendamentoId}`, agendamentoCompleto).subscribe({
@@ -389,12 +394,26 @@ export class AgendaComponent implements OnInit {
       });
     } else {
       // Criar novo agendamento
+      const agendamentoRequest: AgendamentoRequest = {
+        data_de: dataForm,
+        clienteId: formData.clienteId,
+        servicoId: formData.servicoId,
+        colaboradorId: formData.colaboradorId,
+        repete: formData.repete,
+        dias: formData.repete ? formData.dias : undefined
+      };
+      
+      console.log('Criando novo agendamento:', agendamentoRequest);
+      
       this.agendamentoService.createAgendamento(agendamentoRequest).subscribe({
         next: () => {
           this.modalService.dismissAll();
           this.carregarAgendamentos();
         },
-        error: (error) => console.error('Erro ao criar agendamento:', error)
+        error: (error) => {
+          console.error('Erro ao criar agendamento:', error);
+          console.log('Payload enviado:', agendamentoRequest);
+        }
       });
     }
   }
@@ -455,5 +474,22 @@ export class AgendaComponent implements OnInit {
     const hora = dataObj.getHours().toString().padStart(2, '0');
     const minutos = dataObj.getMinutes().toString().padStart(2, '0');
     return `${hora}:${minutos}`;
+  }
+
+  baixarRelatorio() {
+    this.agendamentoService.relatorioSemanal().subscribe({
+      next: (blob: Blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'AgendamentosSemana.xlsx';
+        a.click();
+        window.URL.revokeObjectURL(url);
+      },
+      error: (err) => {
+        console.error('Erro ao baixar o relatório:', err);
+        alert('Erro ao baixar o relatório. Verifique se a API está rodando.');
+      }
+    });
   }
 }
