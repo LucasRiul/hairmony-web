@@ -8,6 +8,7 @@ interface Cliente {
   id: string; // Guid no backend
   nome: string;
   celular: string;
+  celularFormatado: string;
   data_criacao: Date;
   salaoId: string; // Guid no backend
 }
