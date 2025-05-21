@@ -89,9 +89,9 @@ export class AgendaComponent implements OnInit {
     this.agendamentoForm = this.fb.group({
       data_de: [new Date(), [Validators.required]],
       hora: ['08:00', [Validators.required]],
-      clienteId: ['', [Validators.required]],
-      servicoId: ['', [Validators.required]],
-      colaboradorId: ['', [Validators.required]],
+      clienteid: ['', [Validators.required]],
+      servicoid: ['', [Validators.required]],
+      colaboradorid: ['', [Validators.required]],
       repete: [false],
       dias: [{ value: 7, disabled: true }]
     });
@@ -189,6 +189,7 @@ export class AgendaComponent implements OnInit {
     const agendamentosDoDia = this.agendamentos.filter(agendamento => {
       // Converter para objetos Date
       const dataAgendamento = new Date(agendamento.data_de);
+      dataAgendamento.setHours(dataAgendamento.getHours() + 3);
       
       // Comparar apenas as datas (sem horas)
       return this.saoMesmaData(dataAgendamento, dataSelecionadaObj);
@@ -207,6 +208,9 @@ export class AgendaComponent implements OnInit {
       // Garantir que as datas sejam objetos Date válidos
       const dataInicio = new Date(agendamento.data_de);
       const dataFim = new Date(agendamento.data_ate);
+      dataInicio.setHours(dataInicio.getHours() + 3);
+      dataFim.setHours(dataFim.getHours() + 3);
+
       
       // Verificar se as datas são válidas
       if (isNaN(dataInicio.getTime()) || isNaN(dataFim.getTime())) {
@@ -231,7 +235,7 @@ export class AgendaComponent implements OnInit {
       const altura = (duracaoMinutos / 30) * 65; // 65px por slot de 30min
       
       // Obter o índice da coluna para o colaborador deste agendamento
-      const colIndex = colaboradoresMap.get(agendamento.colaboradorId);
+      const colIndex = colaboradoresMap.get(agendamento.colaboradorid);
       
       // Se o colaborador não for encontrado, não mostrar o agendamento
       if (colIndex === undefined) {
@@ -240,7 +244,7 @@ export class AgendaComponent implements OnInit {
       }
       
       // Calcular a posição left baseada no índice da coluna
-      const leftPosicao = `${colIndex * 20}%`;
+      const leftPosicao = `${colIndex * (100 / colaboradoresMap.size)}%`;
       
       // Selecionar cor baseada no serviço ou status
       const corIndex = index % this.cores.length;
@@ -292,9 +296,9 @@ export class AgendaComponent implements OnInit {
         // data_de: dataAgendamento,
         data_de: `${dataFormatada}`,
         hora: `${hora}:${minutos}`,
-        clienteId: agendamento.clienteId,
-        servicoId: agendamento.servicoId,
-        colaboradorId: agendamento.colaboradorId,
+        clienteid: agendamento.clienteid,
+        servicoid: agendamento.servicoid,
+        colaboradorid: agendamento.colaboradorid,
         repete: false,
         dias: 7
       });
@@ -311,9 +315,9 @@ export class AgendaComponent implements OnInit {
         dias: 7
       });
       
-      this.agendamentoForm.get('clienteId')?.reset();
-      this.agendamentoForm.get('servicoId')?.reset();
-      this.agendamentoForm.get('colaboradorId')?.reset();
+      this.agendamentoForm.get('clienteid')?.reset();
+      this.agendamentoForm.get('servicoid')?.reset();
+      this.agendamentoForm.get('colaboradorid')?.reset();
     }
 
     this.modalService.open(content, { centered: true, size: 'lg' });
@@ -371,9 +375,9 @@ export class AgendaComponent implements OnInit {
             ...agendamentoAtual,
             data_de: dataForm,
             data_ate: dataForm,
-            clienteId: formData.clienteId,
-            servicoId: formData.servicoId,
-            colaboradorId: formData.colaboradorId
+            clienteid: formData.clienteid,
+            servicoid: formData.servicoid,
+            colaboradorid: formData.colaboradorid
           };
           
           console.log('Atualizando agendamento:', agendamentoCompleto);
@@ -396,9 +400,9 @@ export class AgendaComponent implements OnInit {
       // Criar novo agendamento
       const agendamentoRequest: AgendamentoRequest = {
         data_de: dataForm,
-        clienteId: formData.clienteId,
-        servicoId: formData.servicoId,
-        colaboradorId: formData.colaboradorId,
+        clienteid: formData.clienteid,
+        servicoid: formData.servicoid,
+        colaboradorid: formData.colaboradorid,
         repete: formData.repete,
         dias: formData.repete ? formData.dias : undefined
       };
@@ -442,29 +446,31 @@ export class AgendaComponent implements OnInit {
     }
   }
 
-  getDuracaoServico(servicoId: string): number {
-    const servico = this.servicos.find(s => s.id === servicoId);
+  getDuracaoServico(servicoid: string): number {
+    const servico = this.servicos.find(s => s.id === servicoid);
     return servico ? servico.duracao : 30;
   }
 
-  getNomeCliente(clienteId: string): string {
-    const cliente = this.clientes.find(c => c.id === clienteId);
+  getNomeCliente(clienteid: string): string {
+    const cliente = this.clientes.find(c => c.id === clienteid);
     return cliente ? cliente.nome : 'Cliente não encontrado';
   }
 
-  getNomeServico(servicoId: string): string {
-    const servico = this.servicos.find(s => s.id === servicoId);
+  getNomeServico(servicoid: string): string {
+    const servico = this.servicos.find(s => s.id === servicoid);
     return servico ? servico.nome : 'Serviço não encontrado';
   }
 
-  getPrecoServico(servicoId: string): string {
-    const servico = this.servicos.find(s => s.id === servicoId);
+  getPrecoServico(servicoid: string): string {
+    const servico = this.servicos.find(s => s.id === servicoid);
     return servico ? servico.preco.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : 'R$ 0,00';
   }
 
   formatHorario(data: Date | string): string {
     // Garantir que data seja um objeto Date
     const dataObj = data instanceof Date ? data : new Date(data);
+    dataObj.setHours(dataObj.getHours() + 3);
+
     
     // Verificar se é uma data válida
     if (isNaN(dataObj.getTime())) {
@@ -491,5 +497,10 @@ export class AgendaComponent implements OnInit {
         alert('Erro ao baixar o relatório. Verifique se a API está rodando.');
       }
     });
+  }
+
+  private formatarDataSemTimezone(data: Date): string {
+    // Formato ISO sem o 'Z' no final (que indica UTC)
+    return `${data.getFullYear()}-${String(data.getMonth() + 1).padStart(2, '0')}-${String(data.getDate()).padStart(2, '0')}T${String(data.getHours()).padStart(2, '0')}:${String(data.getMinutes()).padStart(2, '0')}:${String(data.getSeconds()).padStart(2, '0')}`;
   }
 }

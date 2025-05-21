@@ -30,9 +30,9 @@ export interface Agendamento {
   concluido: boolean;
   data_criacao: Date;
   salaoId: string; // Guid no backend
-  clienteId: string; // Guid no backend
-  servicoId: string; // Guid no backend
-  colaboradorId: string; // Guid no backend
+  clienteid: string; // Guid no backend
+  servicoid: string; // Guid no backend
+  colaboradorid: string; // Guid no backend
   
   // Propriedades adicionais para exibição na agenda
   cliente?: Cliente;
@@ -42,9 +42,9 @@ export interface Agendamento {
 
 export interface AgendamentoRequest {
   data_de: Date;
-  clienteId: string;
-  servicoId: string;
-  colaboradorId: string;
+  clienteid: string;
+  servicoid: string;
+  colaboradorid: string;
   concluido?: boolean;
   repete?: boolean;
   dias?: number;
@@ -76,9 +76,9 @@ export class AgendamentoService {
         }
         
         // Obter detalhes de clientes, serviços e colaboradores
-        const clientesIds = [...new Set(agendamentos.map(a => a.clienteId))];
-        const servicosIds = [...new Set(agendamentos.map(a => a.servicoId))];
-        const colaboradoresIds = [...new Set(agendamentos.map(a => a.colaboradorId))];
+        const clientesIds = [...new Set(agendamentos.map(a => a.clienteid))];
+        const servicosIds = [...new Set(agendamentos.map(a => a.servicoid))];
+        const colaboradoresIds = [...new Set(agendamentos.map(a => a.colaboradorid))];
         
         const clientesRequest = this.http.get<Cliente[]>(`${environment.apiUrl}/clientes`);
         const servicosRequest = this.http.get<Servico[]>(`${environment.apiUrl}/servicos`);
@@ -91,9 +91,9 @@ export class AgendamentoService {
         ]).pipe(
           map(([clientes, servicos, colaboradores]) => {
             return agendamentos.map(agendamento => {
-              const cliente = clientes.find(c => c.id === agendamento.clienteId);
-              const servico = servicos.find(s => s.id === agendamento.servicoId);
-              const colaborador = colaboradores.find(c => c.id === agendamento.colaboradorId);
+              const cliente = clientes.find(c => c.id === agendamento.clienteid);
+              const servico = servicos.find(s => s.id === agendamento.servicoid);
+              const colaborador = colaboradores.find(c => c.id === agendamento.colaboradorid);
               
               return {
                 ...agendamento,
@@ -118,7 +118,11 @@ export class AgendamentoService {
       ...agendamento,
       salaoId: salaoId
     };
-    return this.http.post<Agendamento>(`${this.apiUrl}?repete=${agendamento.repete}&dias=${agendamento.dias}`, agendamentoComSalao);
+    var stringRepete = '';
+    if(agendamento.repete == true){
+      stringRepete = `?repete=${agendamento.repete}&dias=${agendamento.dias}`;
+    }
+    return this.http.post<Agendamento>(`${this.apiUrl}${stringRepete}`, agendamentoComSalao);
   }
 
   updateAgendamento(id: string, agendamentoData: Partial<Agendamento>): Observable<Agendamento> {

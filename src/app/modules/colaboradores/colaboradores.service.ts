@@ -8,7 +8,7 @@ interface Colaborador {
   nome: string;
   ativo: boolean;
   data_criacao: Date;
-  salaoId: string; // Guid no backend
+  salaoid: string; // Guid no backend
 }
 
 @Injectable({
@@ -28,15 +28,15 @@ export class ColaboradoresService {
   }
 
   createColaborador(colaborador: Omit<Colaborador, 'id' | 'data_criacao'>): Observable<Colaborador> {
-    const salaoId = this.getSalaoIdFromStorage();
+    const salaoid = this.getSalaoIdFromStorage();
     const colaboradorComSalao = {
       ...colaborador,
-      salaoId: salaoId
+      salaoid: salaoid
     };
     return this.http.post<Colaborador>(this.apiUrl, colaboradorComSalao);
   }
 
-  updateColaborador(id: string, colaboradorData: Partial<Omit<Colaborador, 'id' | 'salaoId' | 'data_criacao'>>): Observable<Colaborador> {
+  updateColaborador(id: string, colaboradorData: Partial<Omit<Colaborador, 'id' | 'salaoid' | 'data_criacao'>>): Observable<Colaborador> {
     // Primeiro, buscar o colaborador atual
     return this.getColaborador(id).pipe(
       switchMap(colaboradorAtual => {

@@ -10,7 +10,7 @@ interface Colaborador {
   nome: string;
   ativo: boolean;
   data_criacao: Date;
-  salaoId: string; // Guid no backend
+  salaoid: string; // Guid no backend
 }
 
 @Component({
@@ -107,7 +107,7 @@ export class ColaboradoresComponent implements OnInit {
             nome: colaboradorData.nome,
             ativo: colaboradorData.ativo,
             data_criacao: colaboradorAtual.data_criacao,
-            salaoId: colaboradorAtual.salaoId
+            salaoid: colaboradorAtual.salaoid
           };
           
           // Enviar o objeto completo para a API

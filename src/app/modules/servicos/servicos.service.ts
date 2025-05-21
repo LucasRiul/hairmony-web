@@ -10,7 +10,7 @@ interface Servico {
   duracao: number;
   preco: number;
   data_criacao: Date;
-  salaoId: string; // Guid no backend
+  salaoid: string; // Guid no backend
 }
 
 @Injectable({
@@ -30,15 +30,15 @@ export class ServicoService {
   }
 
   createServico(servico: Omit<Servico, 'id' | 'data_criacao'>): Observable<Servico> {
-    const salaoId = this.getSalaoIdFromStorage();
+    const salaoid = this.getSalaoIdFromStorage();
     const servicoComSalao = {
       ...servico,
-      salaoId: salaoId
+      salaoid: salaoid
     };
     return this.http.post<Servico>(this.apiUrl, servicoComSalao);
   }
 
-  updateServico(id: string, servicoData: Partial<Omit<Servico, 'id' | 'salaoId' | 'data_criacao'>>): Observable<Servico> {
+  updateServico(id: string, servicoData: Partial<Omit<Servico, 'id' | 'salaoid' | 'data_criacao'>>): Observable<Servico> {
     // Primeiro, buscar o serviço atual
     return this.getServico(id).pipe(
       switchMap(servicoAtual => {

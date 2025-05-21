@@ -79,7 +79,7 @@
             >
               <div class="agenda-appointment-content">
                 <div class="agenda-appointment-time">
-                  {{ formatHorario(agendamento.data_de) }} - {{ formatHorario(agendamento.data_ate) }} | {{ getNomeCliente(agendamento.clienteId) }} | {{ getNomeServico(agendamento.servicoId) }} | {{ getPrecoServico(agendamento.servicoId) }}
+                  {{ formatHorario(agendamento.data_de) }} - {{ formatHorario(agendamento.data_ate) }} | {{ getNomeCliente(agendamento.clienteid) }} | {{ getNomeServico(agendamento.servicoid) }} | {{ getPrecoServico(agendamento.servicoid) }}
                 </div>
                 <div class="agenda-appointment-actions">
                   <button class="btn btn-sm btn-light" (click)="openModal(formModal, agendamento)" title="Editar">
@@ -132,14 +132,14 @@
         </div>
         
         <div class="mb-3">
-          <label for="clienteId" class="form-label">Cliente*</label>
-          <select class="form-select" id="clienteId" formControlName="clienteId">
+          <label for="clienteid" class="form-label">Cliente*</label>
+          <select class="form-select" id="clienteid" formControlName="clienteid">
             <option value="">Selecione um cliente</option>
             @for (cliente of clientes; track cliente.id) {
               <option [value]="cliente.id">{{ cliente.nome }}</option>
             }
           </select>
-          @if (agendamentoForm.get('clienteId')?.invalid && agendamentoForm.get('clienteId')?.touched) {
+          @if (agendamentoForm.get('clienteid')?.invalid && agendamentoForm.get('clienteid')?.touched) {
             <div class="text-danger mt-1">
               Cliente é obrigatório
             </div>
@@ -147,14 +147,14 @@
         </div>
         
         <div class="mb-3">
-          <label for="servicoId" class="form-label">Serviço*</label>
-          <select class="form-select" id="servicoId" formControlName="servicoId">
+          <label for="servicoid" class="form-label">Serviço*</label>
+          <select class="form-select" id="servicoid" formControlName="servicoid">
             <option value="">Selecione um serviço</option>
             @for (servico of servicos; track servico.id) {
               <option [value]="servico.id">{{ servico.nome }} - {{ servico.duracao }}min - {{ servico.preco | currency:'BRL' }}</option>
             }
           </select>
-          @if (agendamentoForm.get('servicoId')?.invalid && agendamentoForm.get('servicoId')?.touched) {
+          @if (agendamentoForm.get('servicoid')?.invalid && agendamentoForm.get('servicoid')?.touched) {
             <div class="text-danger mt-1">
               Serviço é obrigatório
             </div>
@@ -162,14 +162,14 @@
         </div>
         
         <div class="mb-3">
-          <label for="colaboradorId" class="form-label">Colaborador*</label>
-          <select class="form-select" id="colaboradorId" formControlName="colaboradorId">
+          <label for="colaboradorid" class="form-label">Colaborador*</label>
+          <select class="form-select" id="colaboradorid" formControlName="colaboradorid">
             <option value="">Selecione um colaborador</option>
             @for (colaborador of colaboradores; track colaborador.id) {
               <option [value]="colaborador.id">{{ colaborador.nome }}</option>
             }
           </select>
-          @if (agendamentoForm.get('colaboradorId')?.invalid && agendamentoForm.get('colaboradorId')?.touched) {
+          @if (agendamentoForm.get('colaboradorid')?.invalid && agendamentoForm.get('colaboradorid')?.touched) {
             <div class="text-danger mt-1">
               Colaborador é obrigatório
             </div>

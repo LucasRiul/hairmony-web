@@ -12,7 +12,7 @@ interface Cliente {
   celular: string;
   celularFormatado: string;
   data_criacao: Date;
-  salaoId: string; // Guid no backend
+  salaoid: string; // Guid no backend
 }
 
 @Component({
@@ -109,7 +109,7 @@ export class ClientesComponent implements OnInit {
             nome: clienteData.nome,
             celular: clienteData.celular,
             data_criacao: clienteAtual.data_criacao,
-            salaoId: clienteAtual.salaoId
+            salaoid: clienteAtual.salaoid
           };
           
           // Enviar o objeto completo para a API

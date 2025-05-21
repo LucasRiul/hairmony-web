@@ -11,7 +11,7 @@ interface Servico {
   duracao: number;
   preco: number;
   data_criacao: Date;
-  salaoId: string; // Guid no backend
+  salaoid: string; // Guid no backend
 }
 
 @Component({
@@ -110,7 +110,7 @@ export class ServicosComponent implements OnInit {
             duracao: servicoData.duracao,
             preco: servicoData.preco,
             data_criacao: servicoAtual.data_criacao,
-            salaoId: servicoAtual.salaoId
+            salaoid: servicoAtual.salaoid
           };
           
           // Enviar o objeto completo para a API

@@ -10,7 +10,7 @@ interface Cliente {
   celular: string;
   celularFormatado: string;
   data_criacao: Date;
-  salaoId: string; // Guid no backend
+  salaoid: string; // Guid no backend
 }
 
 @Injectable({
@@ -30,15 +30,15 @@ export class ClienteService {
   }
 
   createCliente(cliente: Omit<Cliente, 'id' |'data_criacao'>): Observable<Cliente> {
-    const salaoId = this.getSalaoIdFromStorage();
+    const salaoid = this.getSalaoIdFromStorage();
     const clienteComSalao = {
       ...cliente,
-      salaoId: salaoId
+      salaoid: salaoid
     };
     return this.http.post<Cliente>(this.apiUrl, clienteComSalao);
   }
 
-  updateCliente(id: string, clienteData: Partial<Omit<Cliente, 'id' | 'salaoId' | 'data_criacao'>>): Observable<Cliente> {
+  updateCliente(id: string, clienteData: Partial<Omit<Cliente, 'id' | 'salaoid' | 'data_criacao'>>): Observable<Cliente> {
     // Primeiro, buscar o cliente atual
     return this.getCliente(id).pipe(
       switchMap(clienteAtual => {
