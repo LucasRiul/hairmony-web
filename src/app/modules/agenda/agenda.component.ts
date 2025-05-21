@@ -288,6 +288,7 @@ export class AgendaComponent implements OnInit {
       this.currentAgendamentoId = agendamento.id;
       
       const dataAgendamento = new Date(agendamento.data_de);
+      dataAgendamento.setHours(dataAgendamento.getHours() + 3);
       const dataFormatada = dataAgendamento.toISOString().substring(0, 10);
       const hora = dataAgendamento.getHours().toString().padStart(2, '0');
       const minutos = dataAgendamento.getMinutes().toString().padStart(2, '0');
@@ -341,12 +342,13 @@ export class AgendaComponent implements OnInit {
     const data = new Date(dataLocal);
     
     // Definir horas e minutos
-    data.setHours(horas, minutos, 0, 0);
+    data.setHours(horas + 3, minutos, 0, 0);
     
     return data;
   }
 
   saveAgendamento(): void {
+    debugger
     if (this.agendamentoForm.invalid) {
       // Marcar todos os campos como touched para mostrar erros
       Object.keys(this.agendamentoForm.controls).forEach(key => {
@@ -368,6 +370,7 @@ export class AgendaComponent implements OnInit {
     
     if (this.isEditing && this.currentAgendamentoId) {
       // Buscar o agendamento atual primeiro
+      dataForm.setHours(dataForm.getHours() - 3);
       this.agendamentoService.getAgendamento(this.currentAgendamentoId).subscribe({
         next: (agendamentoAtual) => {
           // Criar objeto completo com todos os campos originais + atualizações
