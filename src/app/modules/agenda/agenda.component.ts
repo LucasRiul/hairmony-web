@@ -278,7 +278,7 @@ export class AgendaComponent implements OnInit {
 
   openModal(content: any, agendamento?: Agendamento): void {
     if (agendamento) {
-      debugger
+       
       // Edição de agendamento existente
       this.isEditing = true;
       this.currentAgendamentoId = agendamento.id;

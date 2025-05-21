@@ -49,7 +49,7 @@ export class ClientesComponent implements OnInit {
     this.isLoading = true;
     this.clienteService.getClientes().subscribe({
       next: (data) => {
-        debugger
+         
         this.clientes = data;
         this.clientes.forEach(cli => {
           cli.celularFormatado = this.formatFone(cli.celular);
