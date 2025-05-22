@@ -33,6 +33,7 @@ export interface Agendamento {
   clienteid: string; // Guid no backend
   servicoid: string; // Guid no backend
   colaboradorid: string; // Guid no backend
+  observacao: string;
   
   // Propriedades adicionais para exibição na agenda
   cliente?: Cliente;
@@ -48,6 +49,7 @@ export interface AgendamentoRequest {
   concluido?: boolean;
   repete?: boolean;
   dias?: number;
+  observacao: string;
 }
 
 @Injectable({

@@ -93,7 +93,8 @@ export class AgendaComponent implements OnInit {
       servicoid: ['', [Validators.required]],
       colaboradorid: ['', [Validators.required]],
       repete: [false],
-      dias: [{ value: 7, disabled: true }]
+      dias: [{ value: 7, disabled: true }],
+      observacao: ['']
     });
 
     // Observador para habilitar/desabilitar o campo dias
@@ -407,7 +408,8 @@ export class AgendaComponent implements OnInit {
         servicoid: formData.servicoid,
         colaboradorid: formData.colaboradorid,
         repete: formData.repete,
-        dias: formData.repete ? formData.dias : undefined
+        dias: formData.repete ? formData.dias : undefined,
+        observacao: formData.observacao
       };
       
       console.log('Criando novo agendamento:', agendamentoRequest);
