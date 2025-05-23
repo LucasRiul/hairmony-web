@@ -78,11 +78,14 @@
               [class.concluido]="agendamento.concluido"
             >
               <div class="agenda-appointment-content">
-                <div class="agenda-appointment-time">
-                  {{ formatHorario(agendamento.data_de) }} - {{ formatHorario(agendamento.data_ate) }} | {{ getNomeCliente(agendamento.clienteid) }} | {{ getNomeServico(agendamento.servicoid) }} | {{ getPrecoServico(agendamento.servicoid) }}
-                </div>
-                <div class="agenda-appointment-time">
-                  {{agendamento.observacao}}
+                <div style="max-height: 70%; white-space: nowrap; overflow: hidden;text-overflow: ellipsis;   ">
+                  <div class="agenda-appointment-time">
+                    {{ formatHorario(agendamento.data_de) }} - {{ formatHorario(agendamento.data_ate) }} | {{ getNomeCliente(agendamento.clienteid) }} | {{ getNomeServico(agendamento.servicoid) }} | {{ getPrecoServico(agendamento.servicoid) }}
+                  </div>
+                  <div class="agenda-appointment-time">
+                    {{agendamento.observacao}}
+                  </div>
+
                 </div>
                 <div class="agenda-appointment-actions">
                   <button class="btn btn-sm btn-light" (click)="openModal(formModal, agendamento)" title="Editar">
@@ -201,6 +204,12 @@
     <div class="modal-footer">
       <button type="button" class="btn btn-outline-secondary" (click)="modal.dismiss()">Cancelar</button>
       <button type="button" class="btn btn-primario" (click)="saveAgendamento()">{{ isEditing ? 'Atualizar' : 'Salvar' }}</button>
+      @if(erroAgenda != ''){
+      <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        {{ erroAgenda }}
+        <button type="button" class="btn-close" (click)="erroAgenda = ''" aria-label="Close"></button>
+      </div>
+    }
     </div>
   </ng-template>
   

@@ -66,6 +66,7 @@ export class AgendaComponent implements OnInit {
   isEditing = false;
   currentAgendamentoId: string | null = null;
   isLoading = false;
+  erroAgenda: string = '';
   
   // Cores para os agendamentos
   cores = [
@@ -302,7 +303,8 @@ export class AgendaComponent implements OnInit {
         servicoid: agendamento.servicoid,
         colaboradorid: agendamento.colaboradorid,
         repete: false,
-        dias: 7
+        dias: 7,
+        observacao: agendamento.observacao
       });
     } else {
       // Novo agendamento
@@ -349,7 +351,7 @@ export class AgendaComponent implements OnInit {
   }
 
   saveAgendamento(): void {
-    debugger
+     
     if (this.agendamentoForm.invalid) {
       // Marcar todos os campos como touched para mostrar erros
       Object.keys(this.agendamentoForm.controls).forEach(key => {
@@ -381,7 +383,8 @@ export class AgendaComponent implements OnInit {
             data_ate: dataForm,
             clienteid: formData.clienteid,
             servicoid: formData.servicoid,
-            colaboradorid: formData.colaboradorid
+            colaboradorid: formData.colaboradorid,
+            observacao: formData.observacao
           };
           
           console.log('Atualizando agendamento:', agendamentoCompleto);
@@ -393,8 +396,10 @@ export class AgendaComponent implements OnInit {
               this.carregarAgendamentos();
             },
             error: (error) => {
+               
               console.error('Erro ao atualizar agendamento:', error);
               console.log('Payload enviado:', agendamentoCompleto);
+              this.erroAgenda = error.error.detail;
             }
           });
         },
@@ -422,6 +427,8 @@ export class AgendaComponent implements OnInit {
         error: (error) => {
           console.error('Erro ao criar agendamento:', error);
           console.log('Payload enviado:', agendamentoRequest);
+              this.erroAgenda = error.error.detail;
+
         }
       });
     }
