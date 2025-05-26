@@ -24,9 +24,10 @@ With an elegant interface and powerful tools, it simplifies scheduling, improves
 
 Here are some screenshots of Hairmony in action:
 
-| Schedule | Client | Employees | Services
-|----------|----------|----------------|
-| ![Schedule]([./assets/agenda.png](https://github.com/LucasRiul/hairmony-web/blob/main/src/assets/github/agenda.png)) | ![Client](https://github.com/LucasRiul/hairmony-web/blob/main/src/assets/github/clientes.png) | ![Employee](https://github.com/LucasRiul/hairmony-web/blob/main/src/assets/github/colaboradores.png) | ![Services](https://github.com/LucasRiul/hairmony-web/blob/main/src/assets/github/servicos.png) |
+SCHEDULE ![Schedule](https://github.com/LucasRiul/hairmony-web/blob/main/src/assets/github/agenda.png) 
+CLIENTS ![Client](https://github.com/LucasRiul/hairmony-web/blob/main/src/assets/github/clientes.png)
+EMPLOYEES ![Employee](https://github.com/LucasRiul/hairmony-web/blob/main/src/assets/github/colaboradores.png)
+SERVICES ![Services](https://github.com/LucasRiul/hairmony-web/blob/main/src/assets/github/servicos.png) 
 
 ---
 
