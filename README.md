@@ -1,6 +1,6 @@
 # 💇‍♀️ Hairmony – Smart Scheduling for Beauty Professionals
 
-![Hairmony Banner](src\assets\github\login.png)
+![Hairmony Banner](https://github.com/LucasRiul/hairmony-web/blob/main/src/assets/github/agenda.png)
 
 Hairmony is an intuitive web system designed to help beauty professionals like hairdressers, barbers, and salons organize their appointments and manage their businesses more efficiently.
 
