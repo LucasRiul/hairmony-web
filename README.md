@@ -44,6 +44,3 @@ Feel free to reach out for questions, suggestions, or partnerships!
 
 LinkedIn: Lucas Riul Martins | https://www.linkedin.com/in/lucas-riul-martins/
 Email: lucasriul85@gmail.com
-
-📄 License
-This project is under the MIT License.
